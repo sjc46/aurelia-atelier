@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aurelia — The Creator Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #0c0b0a;
+    --ink-2: #141311;
+    --panel: #181614;
+    --panel-2: #1e1c19;
+    --line: rgba(212, 184, 138, 0.18);
+    --line-strong: rgba(212, 184, 138, 0.38);
+    --gold: #c6a56e;
+    --gold-2: #e6d3ae;
+    --ivory: #f4efe6;
+    --ivory-dim: #d9d0c3;
+    --mute: #9c9388;
+    --faint: #6e675e;
+    --good: #b7c4a8;
+    --warn: #c4a56e;
+    --shadow: 0 30px 80px rgba(0,0,0,.45);
+    --serif: "Cormorant Garamond", "Times New Roman", serif;
+    --sans: "Outfit", "Helvetica Neue", sans-serif;
+    --rail: 248px;
+  }
+  [data-theme="day"] {
+    --ink: #f3eee6;
+    --ink-2: #efe8dc;
+    --panel: #f7f2ea;
+    --panel-2: #fffaf3;
+    --line: rgba(92, 68, 36, 0.14);
+    --line-strong: rgba(92, 68, 36, 0.28);
+    --gold: #8a6840;
+    --gold-2: #5c4630;
+    --ivory: #1c1916;
+    --ivory-dim: #3a342c;
+    --mute: #6f675c;
+    --faint: #8a8176;
+    --shadow: 0 24px 60px rgba(70, 50, 20, .08);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--ink);
+    color: var(--ivory);
+    font-family: var(--sans);
+    font-weight: 300;
+    letter-spacing: .01em;
+    min-height: 100%;
+  }
+  body::before {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    opacity: .18;
+    z-index: 80;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.55'/></svg>");
+    mix-blend-mode: overlay;
+  }
+  button, input, textarea, select { font-family: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .app { display: grid; grid-template-columns: var(--rail) 1fr; min-height: 100vh; }
+  .rail {
+    position: sticky; top: 0; height: 100vh;
+    border-right: 1px solid var(--line);
+    padding: 32px 26px;
+    display: flex; flex-direction: column;
+    background: linear-gradient(180deg, rgba(198,165,110,.05), transparent 28%);
+  }
+  .mark {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 42px;
+  }
+  .monogram {
+    width: 42px; height: 42px;
+    border: 1px solid var(--line-strong);
+    display: grid; place-items: center;
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--gold-2);
+    letter-spacing: 0;
+  }
+  .brand-name {
+    font-family: var(--serif);
+    font-size: 22px;
+    letter-spacing: .22em;
+    font-weight: 500;
+  }
+  .brand-sub {
+    font-size: 10px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin-top: 2px;
+  }
+  nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav-btn {
+    background: transparent;
+    border: 0;
+    text-align: left;
+    padding: 12px 10px;
+    color: var(--mute);
+    display: flex; align-items: baseline; gap: 12px;
+    border-left: 1px solid transparent;
+    transition: .25s ease;
+  }
+  .nav-btn small {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--gold);
+    width: 18px;
+  }
+  .nav-btn span { font-size: 13px; letter-spacing: .16em; text-transform: uppercase; }
+  .nav-btn.active, .nav-btn:hover {
+    color: var(--ivory);
+    border-left-color: var(--gold);
+    background: linear-gradient(90deg, rgba(198,165,110,.08), transparent);
+  }
+  .rail-foot { margin-top: auto; }
+  .theme-toggle, .ghost {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--mute);
+    padding: 10px 12px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-size: 10px;
+    width: 100%;
+  }
+  .theme-toggle:hover, .ghost:hover { border-color: var(--gold); color: var(--ivory); }
+  .house-chip {
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: var(--mute);
+    line-height: 1.5;
+  }
+  .house-chip strong {
+    display: block;
+    color: var(--ivory);
+    font-weight: 400;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+  main { min-width: 0; }
+  .view { display: none; padding: 42px 56px 80px; max-width: 1180px; }
+  .view.on { display: block; animation: rise .45s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .kicker {
+    font-size: 11px;
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(46px, 6vw, 78px);
+    line-height: .92;
+    margin: 12px 0 16px;
+    letter-spacing: -0.02em;
+  }
+  h1 em { font-style: italic; color: var(--gold-2); }
+  .lede {
+    max-width: 560px;
+    color: var(--ivory-dim);
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  .rule { height: 1px; background: var(--line); border: 0; margin: 28px 0; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
+  .stat {
+    border-top: 1px solid var(--line-strong);
+    padding-top: 14px;
+  }
+  .stat b {
+    display: block;
+    font-family: var(--serif);
+    font-size: 34px;
+    font-weight: 500;
+    color: var(--gold-2);
+  }
+  .stat span { color: var(--mute); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+  .section-head {
+    display: flex; justify-content: space-between; align-items: end; gap: 20px;
+    margin: 42px 0 18px;
+  }
+  .section-head h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 32px;
+    margin: 0;
+  }
+  .section-head p { margin: 0; color: var(--mute); font-size: 13px; max-width: 360px; text-align: right; }
+  .grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card, .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 22px;
+    position: relative;
+  }
+  .card { cursor: pointer; transition: border-color .2s, transform .2s; }
+  .card:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+  .card .eyebrow, .eyebrow {
+    font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold);
+  }
+  .card h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 26px;
+    margin: 8px 0 8px;
+    line-height: 1.05;
+  }
+  .card p { margin: 0; color: var(--ivory-dim); font-size: 14px; line-height: 1.5; }
+  .meters { display: flex; gap: 16px; margin-top: 16px; }
+  .meter { flex: 1; }
+  .meter label { display: block; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .bar { height: 1px; background: rgba(255,255,255,.08); position: relative; }
+  [data-theme="day"] .bar { background: rgba(0,0,0,.08); }
+  .bar i { position: absolute; left: 0; top: -1px; height: 3px; background: var(--gold); }
+  .quote-panel {
+    background:
+      radial-gradient(600px 240px at 80% 0%, rgba(198,165,110,.12), transparent 60%),
+      var(--panel);
+    min-height: 100%;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .quote-panel blockquote {
+    font-family: var(--serif);
+    font-size: 30px;
+    line-height: 1.15;
+    margin: 18px 0;
+    font-weight: 400;
+  }
+  .quote-panel blockquote em { font-style: italic; color: var(--gold-2); }
+  .signals { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .signal {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 22px 22px 18px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 250px;
+  }
+  .signal header { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+  .yield {
+    font-family: var(--serif);
+    font-size: 28px;
+    color: var(--gold-2);
+    line-height: 1;
+  }
+  .yield small { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: .18em; color: var(--mute); margin-top: 4px; }
+  .signal h3 { font-family: var(--serif); font-size: 28px; font-weight: 500; margin: 4px 0; line-height: 1.05; }
+  .signal p { margin: 0; color: var(--ivory-dim); font-size: 14px; line-height: 1.5; flex: 1; }
+  .row-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .pill {
+    border: 1px solid var(--line);
+    padding: 4px 8px;
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .text-btn, .gold-btn {
+    border: 1px solid var(--gold);
+    background: transparent;
+    color: var(--gold-2);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    font-size: 11px;
+    padding: 11px 16px;
+  }
+  .gold-btn { background: var(--gold); color: #1a140c; border-color: var(--gold); }
+  .gold-btn:hover { filter: brightness(1.08); }
+  .text-btn:hover { background: rgba(198,165,110,.08); }
+  .desk { display: grid; grid-template-columns: 340px 1fr; gap: 22px; align-items: start; }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin-bottom: 8px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line-strong);
+    padding: 10px 0;
+    outline: none;
+    font-size: 15px;
+  }
+  .field textarea { min-height: 72px; resize: vertical; }
+  .choices { display: flex; flex-wrap: wrap; gap: 8px; }
+  .choice {
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--mute);
+    padding: 8px 10px;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .choice.on { border-color: var(--gold); color: var(--gold-2); background: rgba(198,165,110,.08); }
+  .piece {
+    border: 1px solid var(--line);
+    background:
+      linear-gradient(180deg, rgba(198,165,110,.05), transparent 120px),
+      var(--panel-2);
+    min-height: 640px;
+    padding: 36px 40px 28px;
+    box-shadow: var(--shadow);
+  }
+  .piece-top { display: flex; justify-content: space-between; align-items: start; }
+  .piece h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 40px;
+    line-height: 1;
+    margin: 18px 0 8px;
+  }
+  .piece .hook {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 24px;
+    line-height: 1.25;
+    color: var(--gold-2);
+    margin: 18px 0;
+  }
+  .piece .body { font-size: 15.5px; line-height: 1.7; color: var(--ivory-dim); white-space: pre-wrap; }
+  .beats { margin: 18px 0; padding: 0; list-style: none; }
+  .beats li {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .beats b { font-family: var(--serif); font-weight: 500; color: var(--gold); font-size: 16px; }
+  .slides { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .slide {
+    border: 1px solid var(--line);
+    padding: 14px;
+    min-height: 110px;
+  }
+  .slide small { letter-spacing: .16em; text-transform: uppercase; font-size: 10px; color: var(--gold); }
+  .slide p { margin: 8px 0 0; font-family: var(--serif); font-size: 18px; line-height: 1.2; }
+  .piece-actions { display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap; }
+  .empty {
+    height: 100%;
+    min-height: 560px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    color: var(--mute);
+  }
+  .empty h2 { font-family: var(--serif); font-weight: 400; font-size: 48px; color: var(--ivory); margin: 8px 0; }
+  .lib { display: grid; gap: 12px; }
+  .lib-item {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    gap: 18px;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    padding: 16px 0;
+    cursor: pointer;
+  }
+  .lib-item strong { font-family: var(--serif); font-size: 24px; font-weight: 500; display: block; }
+  .lib-item span { color: var(--mute); font-size: 13px; }
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day {
+    border: 1px solid var(--line);
+    min-height: 220px;
+    padding: 12px;
+    background: var(--panel);
+  }
+  .day.today { border-color: var(--gold); }
+  .day .d { font-family: var(--serif); font-size: 28px; }
+  .day .dn { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); }
+  .slot {
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--ivory-dim);
+    border-top: 1px solid var(--line);
+    padding-top: 8px;
+  }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ivory); color: var(--ink);
+    padding: 12px 18px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-size: 11px;
+    opacity: 0; pointer-events: none;
+    transition: .3s ease;
+    z-index: 90;
+  }
+  .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .gate {
+    position: fixed; inset: 0; z-index: 70;
+    background: rgba(8,7,6,.72);
+    display: grid; place-items: center;
+    backdrop-filter: blur(8px);
+  }
+  .gate-card {
+    width: min(520px, calc(100% - 32px));
+    background: var(--ink-2);
+    border: 1px solid var(--line-strong);
+    padding: 36px;
+  }
+  .gate-card h2 { font-family: var(--serif); font-weight: 400; font-size: 48px; margin: 8px 0 8px; }
+  .hidden { display: none !important; }
+  @media (max-width: 980px) {
+    .app { grid-template-columns: 1fr; }
+    .rail { position: sticky; top: 0; height: auto; z-index: 20; border-right: 0; border-bottom: 1px solid var(--line); padding: 16px; background: var(--ink); }
+    nav { flex-direction: row; overflow: auto; }
+    .rail-foot, .brand-sub { display: none; }
+    .mark { margin: 0 0 12px; }
+    .view { padding: 24px 16px 64px; }
+    .grid, .desk, .signals, .cards, .stat-row, .week, .slides { grid-template-columns: 1fr; }
+    .week { grid-template-columns: 1fr 1fr; }
+    .section-head { flex-direction: column; align-items: start; }
+    .section-head p { text-align: left; }
+    .lib-item { grid-template-columns: 1fr; }
+    .studio-grid { grid-template-columns: 1fr; }
+  }
+  .studio-grid { display: grid; grid-template-columns: 320px 1fr; gap: 22px; align-items: start; }
+  .pack { display: flex; flex-direction: column; gap: 12px; }
+  .block {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 18px 20px 16px;
+  }
+  .block header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .block h3 { font-family: var(--serif); font-size: 24px; margin: 0; font-weight: 500; }
+  .block p, .block li { color: var(--ivory-dim); font-size: 15px; line-height: 1.65; }
+  .block ol, .block ul { margin: 0; padding-left: 18px; }
+  .block li + li { margin-top: 6px; }
+  .mini {
+    background: transparent;
+    border: 0;
+    color: var(--gold);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-size: 10px;
+    padding: 0;
+  }
+  .script-line { display: grid; grid-template-columns: 64px 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .script-line b { font-family: var(--serif); color: var(--gold); font-weight: 500; }
+  .stage { display: grid; grid-template-columns: 300px 1fr; gap: 22px; align-items: start; }
+  .phone {
+    width: min(340px, 100%);
+    aspect-ratio: 9 / 16;
+    margin: 0 auto;
+    background: #0c0b0a;
+    border: 1px solid var(--line-strong);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .phone canvas, .phone video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .phone video.hidden, .phone canvas.hidden { display: none; }
+  .reel-note { color: var(--mute); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+  @media (max-width: 980px) {
+    .stage { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="mark">
+      <div class="monogram">A</div>
+      <div>
+        <div class="brand-name">AURELIA</div>
+        <div class="brand-sub">Atelier · MMXXVI</div>
+      </div>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-view="atelier"><small>I</small><span>Atelier</span></button>
+      <button class="nav-btn" data-view="signals"><small>II</small><span>Signals</span></button>
+      <button class="nav-btn" data-view="studio"><small>III</small><span>Generate</span></button>
+      <button class="nav-btn" data-view="reel"><small>IV</small><span>Reel</span></button>
+      <button class="nav-btn" data-view="desk"><small>V</small><span>Desk</span></button>
+      <button class="nav-btn" data-view="library"><small>VI</small><span>Library</span></button>
+      <button class="nav-btn" data-view="week"><small>VII</small><span>Week</span></button>
+    </nav>
+    <div class="rail-foot">
+      <div class="house-chip" id="houseChip"><strong>House voice</strong>Unset — the desk is waiting.</div>
+      <button class="theme-toggle" id="themeBtn">Daylight</button>
+    </div>
+  </aside>
+  <main>
+    <section class="view on" id="view-atelier">
+      <div class="kicker">Private desk · Autumn season</div>
+      <h1>Content, <em>composed.</em></h1>
+      <p class="lede" id="greeting">Aurelia is the atelier for creators who would rather be collected than chased. We do not chase noise. We commission pieces from signals that still pay.</p>
+      <div class="stat-row">
+        <div class="stat"><b>08</b><span>Live signals</span></div>
+        <div class="stat"><b>High</b><span>Yield over reach</span></div>
+        <div class="stat"><b>Fri</b><span>2 October 2026</span></div>
+      </div>
+      <hr class="rule" />
+      <div class="grid">
+        <div>
+          <div class="section-head" style="margin-top:0">
+            <h2>On the desk</h2>
+            <p>Three commissions worth making before the week turns.</p>
+          </div>
+          <div class="cards" id="homeCards"></div>
+        </div>
+        <div class="panel quote-panel">
+          <div>
+            <div class="eyebrow">House note</div>
+            <blockquote>Trend is a crowd. <em>Value</em> is a room that still has a door charge.</blockquote>
+            <p class="lede">This season, generic finance, generic beauty, and generic AI reviews are full. The money is in the specific bend: one number, one room, one craft, one decision.</p>
+          </div>
+          <button class="gold-btn" data-go="studio">Generate content</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-signals">
+      <div class="kicker">Radar · Valuable, not merely loud</div>
+      <h1>Season <em>signals.</em></h1>
+      <p class="lede">Scored for yield, not vanity reach. Autumn 2026: education and specific finance still lead quiet growth; home and a single autumn scene are moving; AI pays when it is used, not reviewed.</p>
+      <hr class="rule" />
+      <div class="signals" id="signalGrid"></div>
+    </section>
+
+    <section class="view" id="view-studio">
+      <div class="kicker">For creators · Ready to post</div>
+      <h1>Generate <em>content.</em></h1>
+      <p class="lede">One brief. A full pack: three hooks, a caption, a spoken script, on-screen lines, a close, and a five-part series in your voice.</p>
+      <hr class="rule" />
+      <div class="studio-grid">
+        <form class="panel" onsubmit="return false;">
+          <div class="field">
+            <label>What are you making</label>
+            <textarea id="genTopic" placeholder="The $1,000 cash buffer. A library in October. Why I stopped posting daily."></textarea>
+          </div>
+          <div class="field">
+            <label>Who it is for</label>
+            <input id="genAudience" placeholder="First-time founders, quiet spenders, design clients" />
+          </div>
+          <div class="field">
+            <label>Offer, if any</label>
+            <input id="genOffer" placeholder="A letter, a consult, a product, nothing yet" />
+          </div>
+          <div class="field">
+            <label>Room</label>
+            <div class="choices" id="genPlatforms"></div>
+          </div>
+          <div class="field">
+            <label>Intent</label>
+            <div class="choices" id="genGoals"></div>
+          </div>
+          <div class="field">
+            <label>Voice</label>
+            <div class="choices" id="genVoices"></div>
+          </div>
+          <button class="gold-btn" id="generateBtn" type="button" style="width:100%">Generate the pack</button>
+        </form>
+        <div id="packHost">
+          <article class="piece">
+            <div class="empty">
+              <div class="eyebrow">Studio</div>
+              <h2>Name the piece.</h2>
+              <p>A subject, an audience, a room. Aurelia writes the content a creator can actually post.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-reel">
+      <div class="kicker">Film · Nine by sixteen</div>
+      <h1>Set the <em>reel.</em></h1>
+      <p class="lede">Aurelia films the pack you just wrote: a title, the hook, the lines, and a close. Eighteen seconds, vertical, with a quiet score. Download it when the frame goes still.</p>
+      <hr class="rule" />
+      <div class="stage">
+        <form class="panel" onsubmit="return false;">
+          <div class="field">
+            <label>Title card</label>
+            <input id="reelTitle" placeholder="Taken from the pack, or name it here" />
+          </div>
+          <div class="field">
+            <label>Length</label>
+            <div class="choices" id="reelLengths"></div>
+          </div>
+          <button class="gold-btn" id="filmBtn" type="button" style="width:100%">Compose the film</button>
+          <p class="reel-note" id="reelStatus">The film uses the latest pack. Generate content first, or title a card and Aurelia will still set a short piece.</p>
+          <a class="text-btn hidden" id="reelDownload" download="aurelia-reel.webm" style="display:inline-block;margin-top:14px;text-align:center">Download the reel</a>
+        </form>
+        <div class="phone">
+          <canvas id="reelCanvas" width="1080" height="1920"></canvas>
+          <video id="reelPlayer" class="hidden" playsinline controls></video>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-desk">
+      <div class="kicker">Commission</div>
+      <h1>The <em>desk.</em></h1>
+      <p class="lede">Choose a signal, a room, and a voice. Aurelia sets the piece in type — hook, body, beats, and the close.</p>
+      <hr class="rule" />
+      <div class="desk">
+        <form class="panel" id="brief" onsubmit="return false;">
+          <div class="field">
+            <label>Signal</label>
+            <select id="topic"></select>
+          </div>
+          <div class="field">
+            <label>Working title, if you have one</label>
+            <input id="customTitle" placeholder="Leave blank to let the house name it" />
+          </div>
+          <div class="field">
+            <label>Room</label>
+            <div class="choices" id="platforms"></div>
+          </div>
+          <div class="field">
+            <label>Form</label>
+            <div class="choices" id="formats"></div>
+          </div>
+          <div class="field">
+            <label>Voice</label>
+            <div class="choices" id="voices"></div>
+          </div>
+          <div class="field">
+            <label>Private note</label>
+            <textarea id="note" placeholder="A detail only you would know — a number, a room, a client, a city."></textarea>
+          </div>
+          <button class="gold-btn" id="commissionBtn" type="button" style="width:100%">Commission the piece</button>
+        </form>
+        <article class="piece" id="piece">
+          <div class="empty" id="emptyState">
+            <div class="eyebrow">Awaiting commission</div>
+            <h2>The page is blank on purpose.</h2>
+            <p>Select a signal. Aurelia will not fill it with noise.</p>
+          </div>
+          <div id="pieceBody" class="hidden"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="view" id="view-library">
+      <div class="kicker">Filed pieces</div>
+      <h1>The <em>library.</em></h1>
+      <p class="lede">What you keep becomes the house style. Pieces stay on this desk, in this browser.</p>
+      <hr class="rule" />
+      <div class="lib" id="library"></div>
+    </section>
+
+    <section class="view" id="view-week">
+      <div class="kicker">Slate · 2–8 October</div>
+      <h1>The <em>week.</em></h1>
+      <p class="lede">A restrained slate. One piece a day. Autumn scenes want to be up before the mood is named by everyone else.</p>
+      <hr class="rule" />
+      <div class="week" id="week"></div>
+    </section>
+  </main>
+</div>
+
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="eyebrow">Aurelia Atelier</div>
+    <h2>Enter.</h2>
+    <p class="lede">A private desk for creators whose attention is worth pricing. Tell the house what to call you.</p>
+    <div class="field" style="margin-top:22px">
+      <label>Name</label>
+      <input id="enterName" placeholder="Your name, or the house name" />
+    </div>
+    <div class="field">
+      <label>Craft</label>
+      <input id="enterCraft" placeholder="Finance, interiors, a studio, a letter" />
+    </div>
+    <button class="gold-btn" id="enterBtn" type="button">Take the desk</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SIGNALS = [
+  {
+    id: "finance",
+    name: "One-number finance",
+    season: "High yield",
+    yield: "A",
+    reach: 62, value: 94, crowd: 78,
+    why: "Personal money remains the highest-paying room on short video, and education-adjacent finance is still growing quietly on Instagram. Generic tips are full. One number — a buffer, a rate, a year — still opens the door.",
+    angle: "A single figure, explained without theatre.",
+    audience: "Earners who want calm, not a thrill."
+  },
+  {
+    id: "solo",
+    name: "The one-person company",
+    season: "Opening",
+    yield: "A−",
+    reach: 58, value: 88, crowd: 46,
+    why: "Solopreneur systems are a 2026 opening: operators paying for tools, not entertainment. Teach the business with no employees — offer, delivery, the Tuesday admin — and the advertisers follow the intent.",
+    angle: "How a company of one actually spends a Tuesday.",
+    audience: "Founders who refuse a headcount."
+  },
+  {
+    id: "ai",
+    name: "AI, used as craft",
+    season: "High yield",
+    yield: "A",
+    reach: 80, value: 86, crowd: 70,
+    why: "Tool roundups are crowded. What still pays is a maker using a model inside a real craft — editing, research, a client deck — and showing the before, the prompt is not the point, the finished object is.",
+    angle: "A finished object, and the one move that made it.",
+    audience: "Practitioners, not spectators."
+  },
+  {
+    id: "autumn",
+    name: "One autumn room",
+    season: "Seasonal window",
+    yield: "B+",
+    reach: 84, value: 74, crowd: 40,
+    why: "Home and decor are moving on TikTok, and ambience breaks out from a single scene, not a genre. October wants the fireplace, the library, the first frost — published before the holiday is named.",
+    angle: "One room, one hour, no tour.",
+    audience: "People furnishing a feeling."
+  },
+  {
+    id: "edu",
+    name: "The expensive explanation",
+    season: "Durable",
+    yield: "A",
+    reach: 55, value: 91, crowd: 52,
+    why: "Education is among the fastest quiet growers, and the niche still earns. A clear explanation with a number beats a personality. Teach the thing a company would pay to have understood.",
+    angle: "Teach one mechanism. Leave the rest.",
+    audience: "Ambitious generalists."
+  },
+  {
+    id: "beauty",
+    name: "Formula, not the haul",
+    season: "Buys",
+    yield: "A−",
+    reach: 66, value: 82, crowd: 73,
+    why: "Skincare pays because people purchase. Hauls do not. Formulation, barrier, season change in October — a reason to buy less, better — keeps the trust that affiliate needs.",
+    angle: "What to retire this month, and why.",
+    audience: "Buyers with a cabinet already."
+  },
+  {
+    id: "table",
+    name: "The weeknight decision",
+    season: "Demand",
+    yield: "B+",
+    reach: 77, value: 70, crowd: 68,
+    why: "Food is crowded and still searched: quick dinners, not performances. One decision that respects a Tuesday is more valuable than a recipe theatre with fourteen ingredients.",
+    angle: "Dinner, decided in the time it takes to listen.",
+    audience: "Households, not hobbyists."
+  },
+  {
+    id: "letter",
+    name: "The unbranded diary",
+    season: "Trust",
+    yield: "B",
+    reach: 48, value: 76, crowd: 30,
+    why: "Creator-economy talk is growing and mostly tactical. The scarce piece is a diary with the numbers left in and the logo left out. Trust compounds; hacks expire.",
+    angle: "What the week actually cost.",
+    audience: "Peers, then clients."
+  }
+];
+
+const PLATFORMS = ["Instagram", "TikTok", "YouTube", "X", "Letter"];
+const FORMATS = ["Reel", "Carousel", "Caption", "Thread", "Essay lede"];
+const VOICES = ["Editorial", "Intimate", "Cinematic", "Exact", "Dry"];
+
+const state = {
+  platform: "Instagram",
+  format: "Reel",
+  voice: "Editorial",
+  topic: "finance",
+  piece: null,
+  library: JSON.parse(localStorage.getItem("aurelia-library") || "[]"),
+  house: JSON.parse(localStorage.getItem("aurelia-house") || "null")
+};
+
+function $(id) { return document.getElementById(id); }
+
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  setTimeout(() => t.classList.remove("on"), 1600);
+}
+
+function go(view) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+  $("view-" + view).classList.add("on");
+  if (view === "library") renderLibrary();
+}
+
+document.querySelectorAll(".nav-btn").forEach(b => b.onclick = () => go(b.dataset.view));
+document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+
+function meter(label, n) {
+  return `<div class="meter"><label>${label}</label><div class="bar"><i style="width:${n}%"></i></div></div>`;
+}
+
+function renderHome() {
+  const picks = ["finance", "autumn", "solo"].map(id => SIGNALS.find(s => s.id === id));
+  $("homeCards").innerHTML = picks.map(s => `
+    <article class="card" data-id="${s.id}">
+      <div class="eyebrow">${s.season} · Yield ${s.yield}</div>
+      <h3>${s.name}</h3>
+      <p>${s.angle}</p>
+      <div class="meters">${meter("Yield", s.value)}${meter("Crowd", s.crowd)}</div>
+    </article>`).join("");
+  $("homeCards").querySelectorAll(".card").forEach(c => c.onclick = () => openSignal(c.dataset.id));
+}
+
+function renderSignals() {
+  $("signalGrid").innerHTML = SIGNALS.map(s => `
+    <article class="signal">
+      <header>
+        <div class="eyebrow">${s.season}</div>
+        <div class="yield">${s.yield}<small>Yield</small></div>
+      </header>
+      <h3>${s.name}</h3>
+      <p>${s.why}</p>
+      <div class="meters">${meter("Yield", s.value)}${meter("Reach", s.reach)}${meter("Crowd", s.crowd)}</div>
+      <div class="row-actions">
+        <span class="pill">${s.audience}</span>
+        <button class="text-btn" data-id="${s.id}">Commission</button>
+      </div>
+    </article>`).join("");
+  $("signalGrid").querySelectorAll("button").forEach(b => b.onclick = () => openSignal(b.dataset.id));
+}
+
+function openSignal(id) {
+  state.topic = id;
+  $("topic").value = id;
+  go("desk");
+}
+
+const gen = { platform: "Instagram", goal: "Trust", voice: "Editorial", pack: null };
+const GOALS = ["Trust", "Grow", "Sell", "Save"];
+
+function renderStudio() {
+  choiceGroup($("genPlatforms"), PLATFORMS, "platform", gen);
+  choiceGroup($("genGoals"), GOALS, "goal", gen);
+  choiceGroup($("genVoices"), VOICES, "voice", gen);
+  if (state.house && !$("genAudience").value) $("genAudience").placeholder = state.house.craft ? `People who want ${state.house.craft}` : $("genAudience").placeholder;
+}
+
+function choiceGroup(el, items, key, bag) {
+  const target = bag || state;
+  el.innerHTML = items.map(item => `<button type="button" class="choice ${target[key] === item ? "on" : ""}" data-v="${item}">${item}</button>`).join("");
+  el.querySelectorAll(".choice").forEach(btn => btn.onclick = () => {
+    target[key] = btn.dataset.v;
+    choiceGroup(el, items, key, bag);
+  });
+}
+
+function renderBrief() {
+  $("topic").innerHTML = SIGNALS.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+  $("topic").value = state.topic;
+  $("topic").onchange = () => state.topic = $("topic").value;
+  choiceGroup($("platforms"), PLATFORMS, "platform");
+  choiceGroup($("formats"), FORMATS, "format");
+  choiceGroup($("voices"), VOICES, "voice");
+}
+
+const OPENERS = {
+  Editorial: [
+    "There is a version of this that performs, and a version that lasts.",
+    "The useful piece is usually the quieter one.",
+    "Most of what is circulating leaves the room unchanged."
+  ],
+  Intimate: [
+    "I almost did not say this out loud.",
+    "This is the note I would send a friend, not a feed.",
+    "Come closer. The useful part is small."
+  ],
+  Cinematic: [
+    "Late light. The city has already decided.",
+    "Hold on the detail. The point arrives after.",
+    "A room, an hour, and the thing no one is filming."
+  ],
+  Exact: [
+    "One claim. Then the proof.",
+    "Ignore the surrounding advice.",
+    "Here is the mechanism, without the costume."
+  ],
+  Dry: [
+    "This will not go viral, which is rather the point.",
+    "A short correction, since the timeline will not make it.",
+    "No reveal. Just the part that saves you the month."
+  ]
+};
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function commission() {
+  const signal = SIGNALS.find(s => s.id === state.topic);
+  const note = $("note").value.trim();
+  const custom = $("customTitle").value.trim();
+  const voice = state.voice;
+  const platform = state.platform;
+  const format = state.format;
+  const detail = note || signal.angle;
+  const title = custom || titleFor(signal, format);
+  const hook = `${pick(OPENERS[voice])} ${detail.charAt(0).toUpperCase() + detail.slice(1).replace(/\.$/, "")}.`;
+  const body = bodyFor(signal, voice, platform, detail);
+  const beats = beatsFor(signal, format, detail);
+  const slides = slidesFor(signal, detail);
+  const close = closeFor(voice, platform);
+  const piece = { id: Date.now(), title, hook, body, beats, slides, close, signal: signal.name, platform, format, voice, detail, at: new Date().toISOString() };
+  state.piece = piece;
+  renderPiece(piece);
+}
+
+function titleFor(s, format) {
+  const map = {
+    finance: ["The number that keeps October quiet", "A buffer, not a personality", "What the statement is not saying"],
+    solo: ["Tuesday, company of one", "The offer before the audience", "Admin as a luxury"],
+    ai: ["The object, not the prompt", "Used, not reviewed", "One move inside the craft"],
+    autumn: ["The room at five", "First frost, no tour", "A library with the fire low"],
+    edu: ["The mechanism, once", "Explain it as if it invoices", "Leave the rest out"],
+    beauty: ["Retire this, keep that", "October, on the barrier", "Less cabinet, better reason"],
+    table: ["Dinner, already decided", "A Tuesday that feeds", "One pan, no performance"],
+    letter: ["What the week cost", "Unbranded, on purpose", "The diary with the numbers in"]
+  };
+  return pick(map[s.id]);
+}
+
+function bodyFor(s, voice, platform, detail) {
+  const rooms = {
+    Instagram: "a still caption under a frame that can stand alone",
+    TikTok: "a spoken piece that earns the second loop",
+    YouTube: "an opening that promises one understanding, then keeps it",
+    X: "a sequence short enough to be reread",
+    Letter: "a letter a person finishes"
+  };
+  return `${s.name} is valuable this season because ${s.why.charAt(0).toLowerCase() + s.why.slice(1)}\n\nFor ${platform}, shape it as ${rooms[platform]}. The private note on this commission: ${detail}.\n\nDo not widen the claim. ${s.audience} The crowd is already making the general version. Yours should be collectible — specific enough that a stranger could use it tonight, restrained enough that it still sounds like a house, not a feed.`;
+}
+
+function beatsFor(s, format, detail) {
+  if (format === "Carousel") return [];
+  return [
+    ["0:00", `Open on the detail, not the niche. Say: “${detail}.”`],
+    ["0:04", `Name the costly mistake in ${s.name.toLowerCase()} without mocking the viewer.`],
+    ["0:12", "Give the single mechanism. One number, one room, one decision."],
+    ["0:28", "Show the after in ordinary light. No montage."],
+    ["0:42", "Close by removing something — an app, a product, a meeting — rather than adding one."]
+  ];
+}
+
+function slidesFor(s, detail) {
+  return [
+    ["01", detail],
+    ["02", "The crowded version of this, and why it no longer pays."],
+    ["03", "The one distinction worth keeping."],
+    ["04", s.angle],
+    ["05", "What to do before Sunday."],
+    ["06", "A line worth saving."]
+  ];
+}
+
+function closeFor(voice, platform) {
+  const lines = {
+    Editorial: "File it. Do not hashtag it into anonymity.",
+    Intimate: "If it helped, keep it. That is the whole ask.",
+    Cinematic: "Cut to black on the room, not on your face.",
+    Exact: "One action. Then stop talking.",
+    Dry: "You may now return to the louder advice."
+  };
+  return `${lines[voice]} Best posted where ${platform} still rewards a save over a stitch — early evening, before the feed forgets the afternoon.`;
+}
+
+function renderPiece(p) {
+  $("emptyState").classList.add("hidden");
+  const body = $("pieceBody");
+  body.classList.remove("hidden");
+  const beats = p.format === "Carousel"
+    ? `<div class="slides">${p.slides.map(s => `<div class="slide"><small>Slide ${s[0]}</small><p>${s[1]}</p></div>`).join("")}</div>`
+    : `<ul class="beats">${p.beats.map(b => `<li><b>${b[0]}</b><span>${b[1]}</span></li>`).join("")}</ul>`;
+  body.innerHTML = `
+    <div class="piece-top">
+      <div class="eyebrow">${p.platform} · ${p.format} · ${p.voice}</div>
+      <div class="eyebrow">${p.signal}</div>
+    </div>
+    <h2>${p.title}</h2>
+    <div class="hook">${p.hook}</div>
+    <div class="body">${p.body}</div>
+    ${beats}
+    <div class="hook" style="font-size:20px">${p.close}</div>
+    <div class="piece-actions">
+      <button class="gold-btn" id="copyBtn" type="button">Copy the piece</button>
+      <button class="text-btn" id="saveBtn" type="button">File in library</button>
+      <button class="text-btn" id="againBtn" type="button">Another setting</button>
+    </div>`;
+  $("copyBtn").onclick = () => { navigator.clipboard.writeText(plain(p)); toast("Taken to the clipboard"); };
+  $("saveBtn").onclick = () => savePiece(p);
+  $("againBtn").onclick = commission;
+}
+
+function plain(p) {
+  const mid = p.format === "Carousel"
+    ? p.slides.map(s => `Slide ${s[0]}: ${s[1]}`).join("\n")
+    : p.beats.map(b => `${b[0]}  ${b[1]}`).join("\n");
+  return `${p.title}\n${p.platform} · ${p.format} · ${p.voice}\n\n${p.hook}\n\n${p.body}\n\n${mid}\n\n${p.close}\n\n— Aurelia Atelier`;
+}
+
+function savePiece(p) {
+  if (state.library.some(x => x.id === p.id)) { toast("Already filed"); return; }
+  state.library.unshift(p);
+  localStorage.setItem("aurelia-library", JSON.stringify(state.library.slice(0, 40)));
+  toast("Filed in the library");
+}
+
+function renderLibrary() {
+  const el = $("library");
+  if (!state.library.length) {
+    el.innerHTML = `<div class="panel"><div class="eyebrow">Empty</div><h2 style="font-family:var(--serif);font-weight:400;font-size:36px">Nothing filed yet.</h2><p class="lede">Commission a piece, then keep only what sounds like you.</p></div>`;
+    return;
+  }
+  el.innerHTML = state.library.map(p => `
+    <div class="lib-item" data-id="${p.id}">
+      <span>${new Date(p.at).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}</span>
+      <div><strong>${p.title}</strong><span>${p.platform} · ${p.format} · ${p.signal}</span></div>
+      <button class="text-btn" data-open="${p.id}" type="button">Open</button>
+    </div>`).join("");
+  el.querySelectorAll("[data-open]").forEach(b => b.onclick = () => {
+    const p = state.library.find(x => String(x.id) === b.dataset.open);
+    state.piece = p;
+    go("desk");
+    renderPiece(p);
+  });
+}
+
+function renderWeek() {
+  const days = [
+    ["Fri", "02", "One-number finance. A reel. Early evening.", true],
+    ["Sat", "03", "The autumn room. No speaking for the first four seconds.", false],
+    ["Sun", "04", "Letter: what the week cost. Send, do not post everywhere.", false],
+    ["Mon", "05", "One-person company. The Tuesday admin, filmed on Monday.", false],
+    ["Tue", "06", "Formula, not the haul. Retire one product.", false],
+    ["Wed", "07", "AI used as craft. Show the finished object only.", false],
+    ["Thu", "08", "Weeknight decision. One pan. End on the table, not the face.", false]
+  ];
+  $("week").innerHTML = days.map(d => `
+    <div class="day ${d[3] ? "today" : ""}">
+      <div class="dn">${d[0]}${d[3] ? " · today" : ""}</div>
+      <div class="d">${d[1]}</div>
+      <div class="slot">${d[2]}</div>
+    </div>`).join("");
+}
+
+function paintHouse() {
+  const h = state.house;
+  $("houseChip").innerHTML = h
+    ? `<strong>${h.name}</strong>${h.craft || "Independent"}`
+    : `<strong>House voice</strong>Unset — the desk is waiting.`;
+  if (h) $("greeting").textContent = `${h.name}, the floor is yours. Aurelia commissions pieces from signals that still pay — specific finance, a company of one, a single autumn room — and leaves the crowded versions to the crowd.`;
+}
+
+$("themeBtn").onclick = () => {
+  const day = document.body.dataset.theme === "day";
+  document.body.dataset.theme = day ? "" : "day";
+  $("themeBtn").textContent = day ? "Daylight" : "Evening";
+};
+
+$("commissionBtn").onclick = commission;
+$("generateBtn").onclick = generatePack;
+
+function generatePack() {
+  const topic = $("genTopic").value.trim();
+  if (!topic) { toast("Name the piece first"); $("genTopic").focus(); return; }
+  const audience = $("genAudience").value.trim() || "the person who already cares";
+  const offer = $("genOffer").value.trim();
+  const house = state.house?.name || "the house";
+  const { platform, goal, voice } = gen;
+  const intent = { Trust: "to be kept, not merely seen", Grow: "to be sent to one other person", Sell: "to make the offer feel inevitable, not loud", Save: "to be filed and returned to" }[goal];
+  const hooks = hookSet(topic, voice, audience);
+  const caption = captionFor(topic, audience, offer, voice, platform, intent, house);
+  const script = scriptFor(topic, audience, voice, offer);
+  const onscreen = [topic, `For ${audience}`, "The crowded version fails here", "One distinction", offer ? `If you want it: ${offer}` : "Keep the one line"];
+  const series = seriesFor(topic, audience);
+  const tags = tagsFor(topic, platform);
+  const cta = ctaFor(goal, offer, platform);
+  gen.pack = { id: Date.now(), kind: "pack", title: topic, platform, goal, voice, audience, offer, hooks, caption, script, onscreen, series, tags, cta, at: new Date().toISOString() };
+  renderPack(gen.pack);
+}
+
+function hookSet(topic, voice, audience) {
+  const banks = {
+    Editorial: [`${topic} — said without the costume.`, `The useful version of ${topic} is shorter than the popular one.`, `If you make things for ${audience}, start here, not with the trend.`],
+    Intimate: [`I kept ${topic} off the feed for a reason.`, `A note for ${audience}, not for the algorithm.`, `Come closer. ${topic} is smaller than it looks.`],
+    Cinematic: [`Hold on this: ${topic}.`, `No intro. Just ${topic}, in ordinary light.`, `The frame is quiet. The point is ${topic}.`],
+    Exact: [`One claim about ${topic}. Then the proof.`, `${topic}, reduced to what you can use tonight.`, `Ignore the surrounding advice on ${topic}.`],
+    Dry: [`${topic}. The loud version is worse.`, `A correction on ${topic}, since no one else will make it.`, `This will not perform. It will help ${audience}.`]
+  };
+  return banks[voice];
+}
+
+function captionFor(topic, audience, offer, voice, platform, intent, house) {
+  const offerLine = offer ? `\n\nThe door, if you want it: ${offer}.` : "";
+  return `${hookSet(topic, voice, audience)[0]}\n\n${topic} is worth posting only if ${audience} can use it before the day ends. The crowded cut explains the whole subject. This one keeps a single distinction and leaves the rest out.\n\nWritten ${intent}. Shaped for ${platform}, where a save still outranks a stitch.\n\n— ${house}${offerLine}`;
+}
+
+function scriptFor(topic, audience, voice, offer) {
+  return [
+    ["0:00", `Look at the camera only after the first line. Say: “${topic}.”`],
+    ["0:03", `Name who it is for: ${audience}. If they are not in the room, they can leave.`],
+    ["0:08", `The mistake: treating ${topic} as a trend instead of a tool.`],
+    ["0:16", "Give one mechanism. A number, a step, or a thing to remove."],
+    ["0:28", voice === "Cinematic" ? "Cut to the object. No face for four seconds." : "Show the after in the same room you started in."],
+    ["0:40", offer ? `Close on the offer, once: ${offer}.` : "Close by taking something away. Do not ask for a follow."]
+  ];
+}
+
+function seriesFor(topic, audience) {
+  return [
+    `The mistake everyone makes with ${topic}.`,
+    `What ${audience} actually needed to hear.`,
+    `The one number, room, or step inside ${topic}.`,
+    `What I retired so ${topic} could work.`,
+    `The version of ${topic} I would still post in a year.`
+  ];
+}
+
+function tagsFor(topic, platform) {
+  const words = topic.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(w => w.length > 3 && !["this","that","with","from","your","about","into"].includes(w)).slice(0, 3);
+  return [...new Set(["#aurelia", ...words.map(w => "#" + w), platform === "TikTok" ? "#creatortok" : "#creatornotes"])].slice(0, 5);
+}
+
+function ctaFor(goal, offer, platform) {
+  if (goal === "Sell" && offer) return `One line, at the end only: “${offer}.” No second ask. ${platform} punishes a caption that begs.`;
+  if (goal === "Grow") return "Ask them to send it to one person who needed it. Not to follow.";
+  if (goal === "Save") return "End with a line worth screenshotting. The save is the metric.";
+  return "No call to action. Trust is the close. The next piece can ask.";
+}
+
+function block(title, html, text) {
+  return `<section class="block"><header><h3>${title}</h3><button class="mini" type="button" data-copy="${encodeURIComponent(text)}">Copy</button></header>${html}</section>`;
+}
+
+function renderPack(p) {
+  const scriptText = p.script.map(s => `${s[0]}  ${s[1]}`).join("\n");
+  const all = [p.title, `${p.platform} · ${p.goal} · ${p.voice}`, "", "HOOKS", ...p.hooks, "", "CAPTION", p.caption, "", "SCRIPT", scriptText, "", "ON SCREEN", ...p.onscreen, "", "SERIES", ...p.series.map((s,i) => `${i+1}. ${s}`), "", "CLOSE", p.cta, "", p.tags.join(" ")].join("\n");
+  $("packHost").innerHTML = `
+    <div class="pack">
+      <div class="piece-top" style="padding:0 4px">
+        <div class="eyebrow">${p.platform} · ${p.goal} · ${p.voice}</div>
+        <div class="eyebrow">For ${escapeHtml(p.audience)}</div>
+      </div>
+      ${block("Three hooks", `<ol>${p.hooks.map(h => `<li>${escapeHtml(h)}</li>`).join("")}</ol>`, p.hooks.join("\n\n"))}
+      ${block("Caption", `<p style="white-space:pre-wrap;margin:0">${escapeHtml(p.caption)}</p>`, p.caption)}
+      ${block("Spoken script", p.script.map(s => `<div class="script-line"><b>${s[0]}</b><span>${escapeHtml(s[1])}</span></div>`).join(""), scriptText)}
+      ${block("On-screen lines", `<ul>${p.onscreen.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`, p.onscreen.join("\n"))}
+      ${block("Five-part series", `<ol>${p.series.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ol>`, p.series.map((s,i) => `${i+1}. ${s}`).join("\n"))}
+      ${block("Close", `<p style="margin:0">${escapeHtml(p.cta)}</p><p style="margin:10px 0 0;color:var(--gold)">${p.tags.map(escapeHtml).join("  ")}</p>`, `${p.cta}\n\n${p.tags.join(" ")}`)}
+      <div class="piece-actions">
+        <button class="gold-btn" id="copyPack" type="button">Copy the pack</button>
+        <button class="text-btn" id="filePack" type="button">File in library</button>
+        <button class="text-btn" id="regenPack" type="button">Another draft</button>
+        <button class="text-btn" id="toReel" type="button">Set the reel</button>
+      </div>
+    </div>`;
+  $("packHost").querySelectorAll("[data-copy]").forEach(b => b.onclick = () => {
+    navigator.clipboard.writeText(decodeURIComponent(b.dataset.copy));
+    toast("Taken to the clipboard");
+  });
+  $("copyPack").onclick = () => { navigator.clipboard.writeText(all); toast("Pack copied"); };
+  $("filePack").onclick = () => {
+    savePiece({ ...p, signal: "Studio", format: "Creator pack", detail: p.audience, hook: p.hooks[0], body: p.caption, beats: p.script, slides: p.series.map((s,i) => [String(i+1).padStart(2,"0"), s]), close: p.cta });
+  };
+  $("regenPack").onclick = generatePack;
+  $("toReel").onclick = () => { go("reel"); };
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, c => "&#" + c.charCodeAt(0) + ";");
+}
+
+const reelState = { length: "18s" };
+function renderReel() {
+  const lengths = ["12s", "18s", "24s"];
+  const el = $("reelLengths");
+  el.innerHTML = lengths.map(item => `<button type="button" class="choice ${reelState.length === item ? "on" : ""}" data-v="${item}">${item}</button>`).join("");
+  el.querySelectorAll(".choice").forEach(btn => btn.onclick = () => { reelState.length = btn.dataset.v; renderReel(); });
+  if (gen.pack && !$("reelTitle").value) $("reelTitle").value = gen.pack.title;
+}
+$("filmBtn").onclick = filmReel;
+
+function wrapText(ctx, text, x, y, max, lineHeight, maxLines) {
+  const words = String(text).split(/\s+/);
+  let line = "";
+  const lines = [];
+  words.forEach(word => {
+    const test = line ? line + " " + word : word;
+    if (ctx.measureText(test).width > max && line) { lines.push(line); line = word; }
+    else line = test;
+  });
+  if (line) lines.push(line);
+  const shown = lines.slice(0, maxLines);
+  if (lines.length > maxLines) shown[maxLines - 1] = shown[maxLines - 1].replace(/\s+\S+$/, "") + "…";
+  shown.forEach((ln, i) => ctx.fillText(ln, x, y + i * lineHeight));
+  return shown.length;
+}
+
+function drawFrame(ctx, scene, p) {
+  const w = 1080, h = 1920;
+  ctx.clearRect(0, 0, w, h);
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, "#16130f");
+  g.addColorStop(1, "#0b0a09");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+  const glow = ctx.createRadialGradient(w * 0.7, h * 0.2, 40, w * 0.5, h * 0.4, 900);
+  glow.addColorStop(0, "rgba(198,165,110,0.16)");
+  glow.addColorStop(1, "rgba(198,165,110,0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = "rgba(198,165,110,0.45)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(64, 64, w - 128, h - 128);
+  const fade = p < 0.12 ? p / 0.12 : p > 0.84 ? (1 - p) / 0.16 : 1;
+  ctx.globalAlpha = Math.max(0, Math.min(1, fade));
+  ctx.fillStyle = "#c6a56e";
+  ctx.font = "500 28px Outfit, sans-serif";
+  ctx.letterSpacing = "8px";
+  ctx.fillText(scene.kicker.toUpperCase(), 120, 220);
+  ctx.letterSpacing = "0px";
+  ctx.fillStyle = "#f4efe6";
+  ctx.font = "500 78px 'Cormorant Garamond', serif";
+  wrapText(ctx, scene.title, 120, 460, 840, 92, 6);
+  if (scene.sub) {
+    ctx.fillStyle = "#d9d0c3";
+    ctx.font = "300 34px Outfit, sans-serif";
+    wrapText(ctx, scene.sub, 120, 1180, 820, 48, 4);
+  }
+  ctx.fillStyle = "#c6a56e";
+  ctx.font = "500 26px Outfit, sans-serif";
+  ctx.fillText("AURELIA", 120, 1720);
+  ctx.globalAlpha = 1;
+}
+
+function scenesForFilm() {
+  const pack = gen.pack;
+  const title = $("reelTitle").value.trim() || pack?.title || "Content, composed.";
+  const audience = pack?.audience || "For the person who already cares";
+  const hook = pack?.hooks?.[0] || title;
+  const lines = (pack?.onscreen || [title, "One distinction", "Leave the rest out"]).slice(0, 4);
+  const close = pack?.cta || "No second ask. Let the frame end.";
+  return [
+    { kicker: "Aurelia", title: "A private film", sub: pack ? pack.platform + "  ·  " + pack.voice : "Atelier" },
+    { kicker: "Title", title, sub: audience },
+    { kicker: "Hook", title: hook, sub: "" },
+    ...lines.map((line, i) => ({ kicker: "0" + (i + 1), title: line, sub: "" })),
+    { kicker: "Close", title: close, sub: "Aurelia Atelier" }
+  ];
+}
+
+async function filmReel() {
+  const btn = $("filmBtn");
+  btn.disabled = true;
+  $("reelStatus").textContent = "Setting type…";
+  $("reelDownload").classList.add("hidden");
+  const player = $("reelPlayer");
+  const canvas = $("reelCanvas");
+  player.classList.add("hidden");
+  canvas.classList.remove("hidden");
+  await document.fonts.ready;
+  const ctx = canvas.getContext("2d");
+  const scenes = scenesForFilm();
+  const total = reelState.length === "12s" ? 12 : reelState.length === "24s" ? 24 : 18;
+  const each = total / scenes.length;
+  const stream = canvas.captureStream(30);
+  let audioCtx;
+  try {
+    audioCtx = new AudioContext();
+    await audioCtx.resume();
+    const dest = audioCtx.createMediaStreamDestination();
+    [196, 247, 294].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.value = 0.015 - i * 0.003;
+      osc.connect(gain).connect(dest);
+      osc.start();
+    });
+    dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+  } catch (e) { audioCtx = null; }
+  const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+    ? "video/webm;codecs=vp9,opus"
+    : MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
+      ? "video/webm;codecs=vp8,opus"
+      : "video/webm";
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4500000 });
+  const chunks = [];
+  rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+  const stopped = new Promise(resolve => rec.onstop = resolve);
+  rec.start(100);
+  const t0 = performance.now();
+  await new Promise(resolve => {
+    function frame(now) {
+      const elapsed = (now - t0) / 1000;
+      const idx = Math.min(scenes.length - 1, Math.floor(elapsed / each));
+      const p = (elapsed - idx * each) / each;
+      drawFrame(ctx, scenes[idx], p);
+      $("reelStatus").textContent = "Filming  " + Math.min(total, elapsed).toFixed(0) + "s  /  " + total + "s";
+      if (elapsed < total) requestAnimationFrame(frame);
+      else resolve();
+    }
+    requestAnimationFrame(frame);
+  });
+  rec.stop();
+  await stopped;
+  stream.getTracks().forEach(t => t.stop());
+  if (audioCtx) audioCtx.close();
+  const blob = new Blob(chunks, { type: mime });
+  const url = URL.createObjectURL(blob);
+  player.src = url;
+  player.classList.remove("hidden");
+  canvas.classList.add("hidden");
+  const link = $("reelDownload");
+  link.href = url;
+  link.classList.remove("hidden");
+  $("reelStatus").textContent = "The reel is set. Play it in the frame, or take it with you.";
+  btn.disabled = false;
+  toast("Reel composed");
+}
+
+$("enterBtn").onclick = () => {
+  const name = $("enterName").value.trim() || "The house";
+  const craft = $("enterCraft").value.trim();
+  state.house = { name, craft };
+  localStorage.setItem("aurelia-house", JSON.stringify(state.house));
+  $("gate").classList.add("hidden");
+  paintHouse();
+};
+
+if (state.house) $("gate").classList.add("hidden");
+renderHome();
+renderSignals();
+renderBrief();
+renderStudio();
+renderReel();
+renderWeek();
+paintHouse();
+</script>
+</body>
+</html>
